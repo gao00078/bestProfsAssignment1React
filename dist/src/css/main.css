@@ -1,0 +1,78 @@
+ul {
+    list-style: none;
+    /*border: solid blue 2px;*/
+}
+
+li {
+    /*border: solid red 2px;*/
+}
+
+h2 {
+    font-size: 1.1em;
+    display: inline-block;
+    padding: 0.3rem 3rem;
+
+}
+
+p {
+    padding: 0rem 3rem;
+}
+
+
+.header {
+    /*border: solid purple 2px;*/
+    font-size: 1.4em;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+
+
+
+
+
+form {
+    padding: 8px 24px;
+}
+form > input,
+form > button,
+form > textarea {
+    display: block;
+    width: 240px;
+    padding: 4px 8px;
+    margin-bottom: 8px;
+    border-radius: 3px;
+    border: 1px solid #888;
+    font-size: 14px;
+    background: none;
+    box-shadow:none;
+}
+
+.nav-bar {
+    list-style-type: none;
+    font-size: 1.2em;
+    font-family: Arial,sans-serif;
+    background-color: lightcoral;
+    color: cornsilk;
+    font-weight: bold;
+    padding-top: 25px;
+    padding-bottom: 25px;
+}
+
+.nav-bar li {
+    display: inline-block;
+    width: 25%;
+    text-align: center;
+    color: darkblue;
+
+}
+
+.nav-bar a:visited, a:link {
+    color: dimgray;
+}
+
+
+.deleteBtn {
+    margin-right: 1rem;
+}
+
