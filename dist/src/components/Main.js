@@ -34,7 +34,7 @@ var List = React.createClass({
 		});
 
 		return (
-			React.createElement('ul', {},
+			React.createElement('ul', {className: 'List'},
 				listOfListItems
 			)
 		);
@@ -147,16 +147,93 @@ let AddNewProfPage = React.createClass({
 });
 
 let ItemPage = React.createClass({
+	propTypes: {
+		itemItemPage: React.PropTypes.object.isRequired
+		// onEditItem: React.PropTypes.func.isRequired
+	},
+	onEditFuc: function () {
+		this.props.onEditItem(this.props.itemItemPage);
+    },
 	render: function () {
 		return (
 			React.createElement('div', {},
 				React.createElement(NavBar, {}),
-				React.createElement('h2', {}, this.props.name),
-				React.createElement('p', {}, 'Email: ' + this.props.email)
+				React.createElement('h2', {}, this.props.itemItemPage.name),
+				React.createElement('p', {}, 'Email: ' + this.props.itemItemPage.email),
+				React.createElement("a", {
+					href: "#/editItem/" + this.props.itemItemPage.id //Important! when go to edit item page, we need a id to find out the item we want to edit
+
+					// type: "button",
+					// onClick: this.onEditFuc
+				}, "Edit")
 			)
 		);
 
 	}
+});
+
+let AddEditForm = React.createClass({
+    propTypes: {
+        currentItem: React.PropTypes.object.isRequired,
+        onChangeEditForm: React.PropTypes.func.isRequired,
+        onSave: React.PropTypes.func.isRequired
+    },
+    onNameChange: function (e) {
+        this.props.onChangeEditForm(Object.assign({}, this.props.currentItem, {
+            name: e.target.value
+        }));
+    },
+    onEmailChange: function (e) {
+        this.props.onChangeEditForm(Object.assign({}, this.props.currentItem, {
+            email: e.target.value
+        }));
+    },
+    onSave: function () {
+        this.props.onSave(this.props.currentItem);
+    },
+    render: function () {
+        return (
+            React.createElement('form', {},
+                React.createElement('input', {
+                    type: 'text',
+                    placeholder: this.props.currentItem.name,
+                    value: this.props.currentItem.name,
+                    onChange: this.onNameChange
+                }),
+                React.createElement('input', {
+                    type: 'text',
+                    placeholder: this.props.currentItem.email,
+                    value: this.props.currentItem.email,
+                    onChange: this.onEmailChange
+                }),
+                React.createElement('button', {
+                    type: 'button',
+                    onClick: this.onSave
+                }, 'Save')
+            )
+        );
+    }
+});
+
+
+let editItemPage = React.createClass({
+	propTypes: {
+		currentItem: React.PropTypes.object.isRequired,
+        onChangeEditPage: React.PropTypes.func.isRequired,
+		onSaveEditPage: React.PropTypes.func.isRequired
+	},
+	render: function () {
+		return(
+			React.createElement("div", {},
+				React.createElement(NavBar, {}),
+				React.createElement(AddEditForm,{
+                    currentItem: this.props.currentItem,
+                    onChangeEditForm: this.props.onChangeEditPage,
+					onSave: this.props.onSaveEditPage
+				})
+			)
+		)
+    }
 });
 
 function updateNewMenuItem(item) {
@@ -164,6 +241,9 @@ function updateNewMenuItem(item) {
 		newItem: item
 	});
 }
+
+
+
 
 function addNewItem(item) {
 	let itemList = state.items;
@@ -179,6 +259,22 @@ function addNewItem(item) {
 		}
 	});
 }
+function updateEditForm(item) {
+	// console.log("enter updateEditForm ");
+	// console.log(item);
+    setState({
+        newItem: item
+    });
+}
+
+// function saveEditItem(item) {
+// 	console.log("enter saveEditItem function");
+//     console.log(item);
+//     console.log(state.items);
+//
+//
+// }
+
 
 
 var state = {};
@@ -192,7 +288,6 @@ function setState(changes) {
 		//                alert("hello");
 		var elementId = e.target.id.split('-')[1];
 		alert(e.target.id);
-		// alert(elementId);
 		var newArray = [];
 		var items = state.items;
 		for (var i = 0; i < items.length; i++) {
@@ -203,6 +298,34 @@ function setState(changes) {
 		});
 
 	};
+
+	state.saveEditItem = function (e) {
+        // console.log("enter saveEditItem function");
+        console.log(state.newItem);
+        console.log(state.items);
+		//edit the item
+        let index = parseInt(splittedUrl[1]);
+        // console.log("index:"+ index);
+        let elementReplacement = {key: index, id: index, name: state.newItem.name, email: state.newItem.email};
+
+		var items = state.items;
+		items.splice(index-1,1,elementReplacement);
+
+		// state.items[index] = {key: index, id: index, name: state.newItem.name, email: state.newItem.email} ;
+
+
+		// Object.assign({}, state.items, {key: index, id: index, name: state.newItem.name, email: state.newItem.email});
+
+        setState({
+            items: items,
+            newItem: {
+                name: '',
+                email: ''
+            }
+        });
+    };
+
+
 
 	let splittedUrl = state.location.replace(/^#\/?|\/$/g, '').split('/');
 
@@ -223,10 +346,26 @@ function setState(changes) {
 			onSubmitNewItem: addNewItem
 		};
 		break;
-	case 'item':
+		case 'item':
 		component = ItemPage;
-		componentProperties = state.items.find(i => i.key == splittedUrl[1]);
+		componentProperties = {
+            itemItemPage: state.items.find(i => i.key == splittedUrl[1])
+            // onEditItem: editItem
+    	};
 		break;
+
+	case "editItem":
+		component = editItemPage;
+		componentProperties = {
+            // currentItem: state.items.find(i => i.key == splittedUrl[1]),
+            currentItem: state.newItem,
+   			 onChangeEditPage: updateEditForm,
+				 onSaveEditPage: state.saveEditItem
+
+
+		};
+		break;
+
 	default:
 		component = ListPage;
 		componentProperties = {
